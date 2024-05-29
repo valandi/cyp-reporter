@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    
+
     steps:
       - name: Check out project
         uses: actions/checkout@v3
@@ -32,14 +32,20 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 
+      - name: Log context for debugging
+        if: github.event_name == 'pull_request'
+        run: echo "PR Number: ${{ github.event.pull_request.number }}"
+
       - name: Comment on Pull Request
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.MY_GITHUB_TOKEN }}
           script: |
+            const prNumber = context.payload.pull_request.number;
+            console.log(`PR Number: ${prNumber}`);
             github.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Hello World'
