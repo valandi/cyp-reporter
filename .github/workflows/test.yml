@@ -2,9 +2,9 @@ name: Run all tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, test_branch ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, test_branch ]
   workflow_dispatch:
 
 # jobs:
