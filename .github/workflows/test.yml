@@ -31,28 +31,3 @@ jobs:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-
-
-    comment:
-        runs-on: ubuntu-latest
-        needs: test  # This ensures the comment job runs only after the test job completes
-        if: github.event_name == 'pull_request'
-
-        steps:
-          - name: Comment on Pull Request
-            uses: actions/github-script@v6
-            with:
-              github-token: ${{ MY_GITHUB_TOKEN.GITHUB_TOKEN }}
-              script: |
-                const prNumber = context.payload.pull_request.number;
-                console.log(`PR Number: ${prNumber}`);
-                github.issues.createComment({
-                  issue_number: prNumber,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: 'Hello World'
-                })
-            env: 
-              APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-              CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-              GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
