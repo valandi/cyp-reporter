@@ -8,6 +8,7 @@ module.exports = {
 
     batchName: 'Cypress asdfasdf',
     batchId: '00009999111122223333',
+    failCypressOnDiff: false,
 
     // Select the browsers and devices to run your tests on via the Ultrafast Grid
     browser: [
