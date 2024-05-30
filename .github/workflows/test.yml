@@ -35,48 +35,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           APPLITOOLS_BATCH_ID: ${{ github.event.pull_request.head.sha || github.sha }}
       
-      - name: Make API Call to fetch batch ID (not pointer)
+      - name: Make API Call to Fetch Data
         id: fetch_data
         run: |
           response=$(curl -s "https://eyes.applitools.com/api/sessions/batches/${{ github.event.pull_request.head.sha || github.sha }}/bypointerid?apiKey=${{ secrets.APPLITOOLS_API_KEY }}")
           echo "$response" > response.json
           id=$(jq -r '.id' response.json)
-          name=$(jq -r '.name' response.json)
-          completedCount=$(jq -r '.completedCount' response.json)
-          passedCount=$(jq -r '.passedCount' response.json)
-          failedCount=$(jq -r '.failedCount' response.json)
-          unresolvedCount=$(jq -r '.unresolvedCount' response.json)
-          emptyCount=$(jq -r '.emptyCount' response.json)
           echo "::set-output name=id::$id"
-          echo "::set-output name=name::$name"
-          echo "::set-output name=completedCount::$completedCount"
-          echo "::set-output name=passedCount::$passedCount"
-          echo "::set-output name=failedCount::$failedCount"
-          echo "::set-output name=unresolvedCount::$unresolvedCount"
-          echo "::set-output name=emptyCount::$emptyCount"
 
       - name: Create Comment
         run: |
           # Use GitHub API to create a comment on the PR
-          BATCH_ID="${{ steps.fetch_data.outputs.id }}"
-          NAME="${{ steps.fetch_data.outputs.name }}"
-          COMPLETED_COUNT="${{ steps.fetch_data.outputs.completedCount }}"
-          PASSED_COUNT="${{ steps.fetch_data.outputs.passedCount }}"
-          FAILED_COUNT="${{ steps.fetch_data.outputs.failedCount }}"
-          UNRESOLVED_COUNT="${{ steps.fetch_data.outputs.unresolvedCount }}"
-          EMPTY_COUNT="${{ steps.fetch_data.outputs.emptyCount }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          COMMENT="<html><head></head><body><h1>Batch Report</h1>
-          <p><strong>Name:</strong> ${NAME}</p>
-          <p><strong>Completed Count:</strong> ${COMPLETED_COUNT}</p>
-          <p><strong>Passed Count:</strong> ${PASSED_COUNT}</p>
-          <p><strong>Failed Count:</strong> ${FAILED_COUNT}</p>
-          <p><strong>Unresolved Count:</strong> ${UNRESOLVED_COUNT}</p>
-          <p><strong>Empty Count:</strong> ${EMPTY_COUNT}</p>
-          <a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'>
-            <img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'>
-          </a></body></html>"
-          GITHUB_TOKEN="${{ secrets.MY_GITHUB_TOKEN }}"
+          BATCH_ID=${{ steps.fetch_data.outputs.id }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMENT="<html><head></head><body><h1>Hello World!</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'></a></body></html>"
+          GITHUB_TOKEN=${{ secrets.MY_GITHUB_TOKEN }}
           COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
 
-          curl -s -H "Authorization: token ${GITHUB_TOKEN}" -X POST "$COMMENT_URL" -d "{\"body\":\"$COMMENT\"}"
+          curl -s -H "Authorization: token ${GITHUB_TOKEN}" -X POST $COMMENT_URL -d "{\"body\":\"$COMMENT\"}"
+
