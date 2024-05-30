@@ -59,7 +59,7 @@ jobs:
         run: |
           # Use GitHub API to create a comment on the PR
           BATCH_ID=${{ steps.fetch_data.outputs.id }}
-          NAME=${{ steps.fetch_data.outputs.name }}
+          NAME="${{ steps.fetch_data.outputs.name }}"
           COMPLETED_COUNT=${{ steps.fetch_data.outputs.completedCount }}
           PASSED_COUNT=${{ steps.fetch_data.outputs.passedCount }}
           FAILED_COUNT=${{ steps.fetch_data.outputs.failedCount }}
