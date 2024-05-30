@@ -50,7 +50,7 @@ jobs:
           # Use GitHub API to create a comment on the PR
           BATCH_ID=${{ steps.fetch_data.outputs.id }}
           PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMENT="<html><head></head><body><h1>Hello World!!!</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'></a><br><strong>Passed Count:</strong><p>${steps.fetch_data_outputs.passedCount}</body></html>"
+          COMMENT="<html><head></head><body><h1>Hello World!!!</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'></a><br><strong>Passed Count:</strong><p>${steps.fetch_data.outputs.passedCount}</body></html>"
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_TOKEN }}
           COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
 
