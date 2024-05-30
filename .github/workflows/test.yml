@@ -35,25 +35,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           APPLITOOLS_BATCH_ID: ${{ github.event.pull_request.head.sha || github.sha }}
       
-- name: Make API Call to fetch batch ID (not pointer)
-      id: fetch_data
-      run: |
-        response=$(curl -s "https://eyes.applitools.com/api/sessions/batches/${{ github.event.pull_request.head.sha || github.sha }}/bypointerid?apiKey=${{ secrets.APPLITOOLS_API_KEY }}")
-        echo "$response" > response.json
-        id=$(jq -r '.id' response.json)
-        name=$(jq -r '.name' response.json)
-        completedCount=$(jq -r '.completedCount' response.json)
-        passedCount=$(jq -r '.passedCount' response.json)
-        failedCount=$(jq -r '.failedCount' response.json)
-        unresolvedCount=$(jq -r '.unresolvedCount' response.json)
-        emptyCount=$(jq -r '.emptyCount' response.json)
-        echo "::set-output name=id::$id"
-        echo "::set-output name=name::$name"
-        echo "::set-output name=completedCount::$completedCount"
-        echo "::set-output name=passedCount::$passedCount"
-        echo "::set-output name=failedCount::$failedCount"
-        echo "::set-output name=unresolvedCount::$unresolvedCount"
-        echo "::set-output name=emptyCount::$emptyCount"
+      - name: Make API Call to fetch batch ID (not pointer)
+        id: fetch_data
+        run: |
+          response=$(curl -s "https://eyes.applitools.com/api/sessions/batches/${{ github.event.pull_request.head.sha || github.sha }}/bypointerid?apiKey=${{ secrets.APPLITOOLS_API_KEY }}")
+          echo "$response" > response.json
+          id=$(jq -r '.id' response.json)
+          name=$(jq -r '.name' response.json)
+          completedCount=$(jq -r '.completedCount' response.json)
+          passedCount=$(jq -r '.passedCount' response.json)
+          failedCount=$(jq -r '.failedCount' response.json)
+          unresolvedCount=$(jq -r '.unresolvedCount' response.json)
+          emptyCount=$(jq -r '.emptyCount' response.json)
+          echo "::set-output name=id::$id"
+          echo "::set-output name=name::$name"
+          echo "::set-output name=completedCount::$completedCount"
+          echo "::set-output name=passedCount::$passedCount"
+          echo "::set-output name=failedCount::$failedCount"
+          echo "::set-output name=unresolvedCount::$unresolvedCount"
+          echo "::set-output name=emptyCount::$emptyCount"
 
     - name: Create Comment
       run: |
