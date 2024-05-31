@@ -1,0 +1,88 @@
+name: Run all tests
+
+on:
+  push:
+    branches: [ main, test_branch ]
+  pull_request:
+    branches: [ main, test_branch ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Clean install the project
+        run: npm ci
+
+
+          
+      - name: Execute all tests
+        run: npm test
+        env: 
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          APPLITOOLS_BATCH_ID: ${{ github.event.pull_request.head.sha || github.sha }}
+      
+      - name: Make API Call to Fetch Data
+        id: fetch_data
+        run: |
+          response=$(curl -s "https://eyes.applitools.com/api/sessions/batches/${{ github.event.pull_request.head.sha || github.sha }}/bypointerid?apiKey=${{ secrets.APPLITOOLS_API_KEY }}")
+          echo "$response" > response.json
+          id=$(jq -r '.id' response.json)
+          completedCount=$(jq -r '.completedCount' response.json)
+          passedCount=$(jq -r '.passedCount' response.json)
+          failedCount=$(jq -r '.failedCount' response.json)
+          unresolvedCount=$(jq -r '.unresolvedCount' response.json)
+          emptyCount=$(jq -r '.emptyCount' response.json)
+          echo "::set-output name=id::$id"
+          echo "::set-output name=completedCount::$completedCount"
+          echo "::set-output name=passedCount::$passedCount"
+          echo "::set-output name=failedCount::$failedCount"
+          echo "::set-output name=unresolvedCount::$unresolvedCount"
+          echo "::set-output name=emptyCount::$emptyCount"
+
+      - name: Download Image
+        run: |
+          curl -o image.png "https://eyes.applitools.com/api/sessions/batches/00000251685128392181/00000251685128392069/steps/2/diff?ApiKey=${{ secrets.APPLITOOLS_API_KEY }}"
+
+      - name: Upload Image to Repository
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p images
+          mv image.png images/image.png
+          git add images/image.png
+          git commit -m "Add image"
+          git push origin HEAD:${{ github.head_ref }} # Push to the correct branch
+
+      - name: Create Comment
+        run: |
+          # Use GitHub API to create a comment on the PR
+          BATCH_ID=${{ steps.fetch_data.outputs.id }}
+          PASSED_COUNT=${{ steps.fetch_data.outputs.passedCount }}
+          COMPLETED_COUNT=${{ steps.fetch_data.outputs.completedCount }}
+          FAILED_COUNT=${{ steps.fetch_data.outputs.failedCount }}
+          UNRESOLVED_COUNT=${{ steps.fetch_data.outputs.unresolvedCount }}
+          EMPTY_COUNT=${{ steps.fetch_data.outputs.emptyCount }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
+
+          COMMENT="<html><head></head><body><h1>Applitools Test Report</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='${IMAGE_URL}' alt='Test Image'></a><br><table border='1'><tr><th>Metric</th><th>Count</th></tr><tr><td>Passed Count</td><td>${PASSED_COUNT}</td></tr><tr><td>Completed Count</td><td>${COMPLETED_COUNT}</td></tr><tr><td>Failed Count</td><td>${FAILED_COUNT}</td></tr><tr><td>Unresolved Count</td><td>${UNRESOLVED_COUNT}</td></tr><tr><td>Empty Count</td><td>${EMPTY_COUNT}</td></tr></table></body></html>"
+
+          GITHUB_TOKEN=${{ secrets.MY_GITHUB_TOKEN }}
+          COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
+
+          curl -s -H "Authorization: token ${GITHUB_TOKEN}" -X POST $COMMENT_URL -d "{\"body\":\"$COMMENT\"}"
+
+

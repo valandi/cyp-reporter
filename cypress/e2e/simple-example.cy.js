@@ -1,9 +1,9 @@
-describe('ACME Bank', () => {
+describe('test cyp reporter', () => {
     beforeEach(() => {
         // Start Applitools Visual AI Test
         cy.eyesOpen({
-            appName: 'ACME Bank',
-            testName: Cypress.currentTest.title,
+            appName: 'test cyp reporter',
+            testName: 'test cyp reporter',
         })
     })
     it('Cypress: Quickstart', () => {
