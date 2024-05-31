@@ -59,14 +59,14 @@ jobs:
           BATCH_ID=${{ steps.fetch_data.outputs.id }}
           PASSED_COUNT=${{ steps.fetch_data.outputs.passedCount }}
           COMPLETED_COUNT=${{ steps.fetch_data.outputs.completedCount }}
-          PASSED_COUNT="${{ steps.fetch_data.outputs.passedCount }}"
-          FAILED_COUNT="${{ steps.fetch_data.outputs.failedCount }}"
-          UNRESOLVED_COUNT="${{ steps.fetch_data.outputs.unresolvedCount }}"
-          EMPTY_COUNT="${{ steps.fetch_data.outputs.emptyCount }}"
+          FAILED_COUNT=${{ steps.fetch_data.outputs.failedCount }}
+          UNRESOLVED_COUNT=${{ steps.fetch_data.outputs.unresolvedCount }}
+          EMPTY_COUNT=${{ steps.fetch_data.outputs.emptyCount }}
           PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMENT="<html><head></head><body><h1>Hello World!!!</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'></a><br><strong>Passed Count:</strong><p>${PASSED_COUNT}</p><strong>Completed Count:</strong><p>${COMPLETED_COUNT}</p><strong>Passed Count:</strong><p>${PASSED_COUNT}</p><strong>Failed Count:</strong><p>${FAILED_COUNT}</p><strong>Unresolved Count:</strong><p>${UNRESOLVED_COUNT}</p><strong>Empty Count:</strong><p>${EMPTY_COUNT}</p></body></html>"
+          COMMENT="<html><head></head><body><h1>Hello World!!!</h1><a href='https://eyes.applitools.com/app/test-results/${BATCH_ID}'><img src='https://images.unsplash.com/photo-1713782522314-caab46f64c79?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'></a><br><table border='1'><tr><th>Metric</th><th>Count</th></tr><tr><td>Passed Count</td><td>${PASSED_COUNT}</td></tr><tr><td>Completed Count</td><td>${COMPLETED_COUNT}</td></tr><tr><td>Failed Count</td><td>${FAILED_COUNT}</td></tr><tr><td>Unresolved Count</td><td>${UNRESOLVED_COUNT}</td></tr><tr><td>Empty Count</td><td>${EMPTY_COUNT}</td></tr></table></body></html>"
           GITHUB_TOKEN=${{ secrets.MY_GITHUB_TOKEN }}
           COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
 
           curl -s -H "Authorization: token ${GITHUB_TOKEN}" -X POST $COMMENT_URL -d "{\"body\":\"$COMMENT\"}"
+
 
